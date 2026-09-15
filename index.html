@@ -1,0 +1,1024 @@
+<title>Штурман МВЗ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --ink:#10161f; --ink-soft:#232c3a;
+    --paper:#eef1ee; --paper-raised:#ffffff;
+    --line:#8b96a0; --line-soft:rgba(139,150,160,.35);
+    --structural:#1f7a7a; --accent:#c9832a;
+    --pt-sid:#2f6fd6; --pt-star:#12946b;
+    --pt-sid-bg:#bfe0f5; --pt-star-bg:#c2e9c8;
+    --boundary:#7c4fe0; --route-fill:#c7c2e6;
+    --good:#2f9e52; --bad:#c1473f;
+    --text:#10161f; --text-muted:#586170;
+    --card-line:rgba(16,22,31,.09);
+    --shadow:0 10px 28px rgba(16,22,31,.12);
+    --font-ui:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ink:#0a0d12; --ink-soft:#161c25;
+      --paper:#121821; --paper-raised:#1a212c;
+      --line:#4b5566; --line-soft:rgba(75,85,102,.4);
+      --structural:#4fc4c4; --accent:#e2a33d;
+      --pt-sid:#6aa8ff; --pt-star:#34d399;
+      --pt-sid-bg:#264160; --pt-star-bg:#1e4530;
+      --boundary:#a882ff; --route-fill:#4d4570;
+      --good:#4caf6f; --bad:#e2695f;
+      --text:#e8ecf1; --text-muted:#98a3b3;
+      --card-line:rgba(255,255,255,.09);
+      --shadow:0 10px 28px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#0a0d12; --ink-soft:#161c25;
+    --paper:#121821; --paper-raised:#1a212c;
+    --line:#4b5566; --line-soft:rgba(75,85,102,.4);
+    --structural:#4fc4c4; --accent:#e2a33d;
+    --pt-sid:#6aa8ff; --pt-star:#34d399;
+    --pt-sid-bg:#264160; --pt-star-bg:#1e4530;
+    --boundary:#a882ff; --route-fill:#4d4570;
+    --good:#4caf6f; --bad:#e2695f;
+    --text:#e8ecf1; --text-muted:#98a3b3;
+    --card-line:rgba(255,255,255,.09);
+    --shadow:0 10px 28px rgba(0,0,0,.45);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:var(--font-ui);}
+  h1,h2,h3{text-wrap:balance;margin:0;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .tnum{font-variant-numeric:tabular-nums;}
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  }
+
+  .app{height:100dvh;display:grid;grid-template-rows:auto auto 1fr;background:var(--paper);}
+
+  /* ---------- Top bar ---------- */
+  .topbar{background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;min-height:52px;}
+  .topbar .brand{display:flex;align-items:center;gap:10px;}
+  .topbar .brand .mark{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--accent),#8a5a12);display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .topbar .titles{display:flex;flex-direction:column;line-height:1.15;}
+  .topbar .titles b{font-size:14.5px;font-weight:700;letter-spacing:.01em;}
+  .topbar .titles span{font-size:11px;color:#aeb8c6;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;}
+  .backbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+  .backbtn:hover{background:rgba(255,255,255,.16);}
+  .topbar .spacer{flex:1;}
+  .statchip{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 12px;display:flex;gap:8px;align-items:center;}
+  .statchip b{color:var(--accent);}
+  [hidden]{display:none !important;}
+
+  /* ---------- Segmented mode switch ---------- */
+  .modebar{display:none;gap:6px;padding:8px 16px;background:var(--ink-soft);overflow-x:auto;}
+  .modebar.show{display:flex;}
+  .modebtn{flex:0 0 auto;background:transparent;border:1px solid rgba(255,255,255,.14);color:#c7cfda;padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;}
+  .modebtn.active{background:var(--accent);border-color:var(--accent);color:#1a1204;font-weight:600;}
+
+  /* ---------- Layout body ---------- */
+  .body-grid{display:grid;grid-template-rows:1fr auto;min-height:0;}
+  @media (min-width:900px){
+    .body-grid{grid-template-columns:1fr 360px;grid-template-rows:1fr;}
+    .stage{min-height:0 !important;}
+    .panel{max-height:none !important;}
+  }
+
+  .stage{position:relative;min-height:min(45vh,320px);overflow:hidden;background:
+    radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--paper-raised) 55%, transparent), transparent 70%),
+    var(--paper);}
+  .stage svg{width:100%;height:100%;display:block;touch-action:none;}
+  .zoomgroup{display:flex;flex-direction:column;border-radius:9px;overflow:hidden;box-shadow:var(--shadow);}
+  .zoomgroup .toolbtn{box-shadow:none;border-radius:0;border-bottom:1px solid var(--card-line);}
+  .zoomgroup .toolbtn:last-child{border-bottom:none;}
+
+  .toolbar{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:8px;}
+  .toolbtn{width:36px;height:36px;border-radius:9px;background:var(--paper-raised);border:1px solid var(--card-line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text);}
+  .toolbtn:hover{filter:brightness(1.05);}
+
+  .tooltip{position:absolute;left:12px;bottom:12px;background:var(--paper-raised);border:1px solid var(--card-line);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;font-family:var(--font-mono);font-size:12px;max-width:270px;line-height:1.6;}
+  .tooltip .name{font-family:var(--font-ui);font-weight:700;font-size:15px;color:var(--text);margin-bottom:2px;display:flex;align-items:center;gap:8px;}
+  .tooltip .name[data-type="SID"] .typebadge{color:var(--pt-sid);border-color:color-mix(in srgb, var(--pt-sid) 45%, transparent);}
+  .tooltip .name[data-type="STAR"] .typebadge{color:var(--pt-star);border-color:color-mix(in srgb, var(--pt-star) 45%, transparent);}
+  .typebadge{font-family:var(--font-mono);font-size:10px;font-weight:600;border:1px solid;border-radius:999px;padding:2px 7px;letter-spacing:.02em;}
+  .tooltip .row{display:flex;justify-content:space-between;gap:10px;color:var(--text-muted);}
+  .tooltip .row b{color:var(--text);font-weight:600;}
+
+  .legend{position:absolute;right:12px;top:12px;display:flex;gap:10px;background:var(--paper-raised);border:1px solid var(--card-line);border-radius:9px;box-shadow:var(--shadow);padding:7px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:2px;display:inline-block;}
+  .legend .sid i{background:var(--pt-sid);}
+  .legend .star i{background:var(--pt-star);}
+
+  /* ---------- Panel (quiz / drag tray) ---------- */
+  .panel{background:var(--paper-raised);border-top:1px solid var(--card-line);display:flex;flex-direction:column;min-height:0;max-height:42vh;}
+  @media (min-width:900px){.panel{border-top:none;border-left:1px solid var(--card-line);}}
+  .panel-inner{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;min-height:0;}
+
+  /* ---------- Menu screen ---------- */
+  .menu{position:absolute;inset:0;overflow-y:auto;background:var(--paper);}
+  .menu-hero{padding:28px 20px 8px;max-width:760px;margin:0 auto;}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.09em;color:var(--structural);text-transform:uppercase;}
+  .menu-hero h1{font-size:26px;margin-top:6px;}
+  .menu-hero p{color:var(--text-muted);margin:8px 0 0;font-size:14.5px;max-width:52ch;}
+  .cards{max-width:760px;margin:18px auto 8px;padding:0 20px;display:grid;gap:12px;}
+  .card{background:var(--paper-raised);border:1px solid var(--card-line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);cursor:pointer;display:flex;gap:14px;align-items:center;text-align:left;}
+  .card:disabled,.card.locked{cursor:default;opacity:.55;}
+  .card .icon{width:44px;height:44px;border-radius:11px;background:color-mix(in srgb, var(--structural) 16%, var(--paper-raised));display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto;}
+  .card.locked .icon{background:color-mix(in srgb, var(--line) 18%, var(--paper-raised));}
+  .card .body{flex:1;min-width:0;}
+  .card .body h3{font-size:15.5px;}
+  .card .body p{margin:3px 0 0;font-size:13px;color:var(--text-muted);}
+  .pill{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent);white-space:nowrap;}
+  .pill.soon{background:color-mix(in srgb, var(--line) 25%, transparent);color:var(--text-muted);}
+  .progress-badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .badge{font-family:var(--font-mono);font-size:11px;background:color-mix(in srgb, var(--good) 14%, transparent);color:var(--good);border-radius:6px;padding:2px 7px;}
+  .menu-foot{max-width:760px;margin:22px auto 34px;padding:14px 20px 0;border-top:1px solid var(--card-line);color:var(--text-muted);font-size:12px;line-height:1.7;}
+
+  /* ---------- Quiz UI ---------- */
+  .prompt{font-size:14.5px;color:var(--text-muted);}
+  .prompt b{color:var(--text);}
+  .qinput{display:flex;gap:8px;}
+  .qinput input{flex:1;font-family:var(--font-mono);font-size:18px;letter-spacing:.06em;text-transform:uppercase;padding:11px 12px;border-radius:10px;border:1.5px solid var(--card-line);background:var(--paper);color:var(--text);min-width:0;}
+  .qinput input:focus{border-color:var(--accent);}
+  .btn{border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn.primary{background:var(--accent);color:#241703;}
+  .btn.ghost{background:transparent;border:1.5px solid var(--card-line);color:var(--text);}
+  .btn.block{width:100%;}
+  .btn:disabled{opacity:.5;cursor:default;}
+  .linklike{background:none;border:none;color:var(--structural);font-size:12.5px;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;align-self:flex-start;}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .choice{font-family:var(--font-mono);font-size:14px;padding:12px 8px;border-radius:10px;border:1.5px solid var(--card-line);background:var(--paper);color:var(--text);cursor:pointer;}
+  .choice:hover{border-color:var(--structural);}
+  .feedback{min-height:20px;font-size:14px;font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .progressbar{height:6px;border-radius:99px;background:var(--card-line);overflow:hidden;}
+  .progressbar > i{display:block;height:100%;background:var(--structural);border-radius:99px;transition:width .25s;}
+  .panel-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);}
+
+  /* ---------- Drag tray ---------- */
+  .tray{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{font-family:var(--font-mono);font-size:13px;font-weight:600;background:var(--paper);border:1.5px solid var(--card-line);border-radius:9px;padding:9px 12px;cursor:grab;touch-action:none;user-select:none;}
+  .chip.armed{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);}
+  .chip.dragging-src{opacity:.35;}
+  .chip.drag-ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%);box-shadow:var(--shadow);}
+
+  /* ---------- Results ---------- */
+  .results{display:flex;flex-direction:column;gap:14px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .stat{background:var(--paper);border:1px solid var(--card-line);border-radius:10px;padding:10px;text-align:center;}
+  .stat b{display:block;font-family:var(--font-mono);font-size:20px;}
+  .stat span{font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
+  .missed-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .missed-list span{font-family:var(--font-mono);font-size:12px;background:color-mix(in srgb, var(--bad) 14%, transparent);color:var(--bad);padding:3px 8px;border-radius:6px;}
+
+  /* ---------- SVG scope styling ---------- */
+  .ring{fill:none;stroke:var(--line-soft);stroke-width:1;}
+  .ring-label{font-family:var(--font-mono);font-size:9.5px;fill:var(--text-muted);}
+  .spoke{stroke:var(--line-soft);stroke-width:1;}
+  .spoke-label{font-family:var(--font-mono);font-size:11px;font-weight:600;fill:var(--text-muted);text-anchor:middle;}
+  .route-line{fill:none;stroke:var(--route-fill);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1.5px 1.5px rgba(16,22,31,.18));}
+  .ring-hint{fill:none;stroke:var(--boundary);stroke-width:5;opacity:.85;stroke-linecap:round;stroke-dasharray:2 14;stroke-linejoin:round;}
+  .ap{cursor:default;}
+  .ap circle{fill:var(--paper-raised);stroke:var(--line);stroke-width:1.5;}
+  .ap.primary .ap-outer{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.4;}
+  .ap.primary .ap-inner{stroke:var(--accent);stroke-width:2.5;fill:color-mix(in srgb, var(--accent) 20%, var(--paper-raised));}
+  .ap text{font-family:var(--font-mono);font-size:10.5px;fill:var(--text-muted);text-anchor:middle;}
+  .ap.primary text{fill:var(--text);font-weight:700;}
+
+  .wp{cursor:pointer;}
+  .wp .wp-hit{fill:transparent;}
+  .wp .wp-slot{fill:none;stroke:var(--line);stroke-width:1.4;opacity:0;r:19;}
+  .wp .wp-badge{r:15;stroke-width:2;transition:opacity .15s,fill .15s,stroke .15s;}
+  .wp .wp-tri{fill:#1b1f24;transition:opacity .15s;}
+  .wp .wp-label{font-family:var(--font-ui);font-weight:700;font-size:13px;fill:var(--text);text-anchor:middle;opacity:0;pointer-events:none;transition:opacity .15s;}
+  .wp .wp-sublabel{font-family:var(--font-mono);font-size:9px;letter-spacing:.02em;fill:var(--text-muted);text-anchor:middle;opacity:0;pointer-events:none;transition:opacity .15s;}
+  .wp[data-type="SID"] .wp-badge{fill:var(--pt-sid-bg);stroke:var(--pt-sid);}
+  .wp[data-type="STAR"] .wp-badge{fill:var(--pt-star-bg);stroke:var(--pt-star);}
+
+  [data-mode="study"] .wp .wp-label,[data-mode="study"] .wp .wp-sublabel{opacity:1;}
+
+  [data-mode="quiz"] .wp .wp-badge,[data-mode="quiz"] .wp .wp-tri{opacity:.5;}
+  [data-mode="quiz"] .wp.target .wp-badge{opacity:1;stroke:var(--accent);stroke-width:3;animation:pulse 1.3s ease-in-out infinite;}
+  [data-mode="quiz"] .wp.target .wp-tri{opacity:1;}
+  [data-mode="quiz"] .wp.solved .wp-badge{opacity:1;stroke:var(--good);}
+  [data-mode="quiz"] .wp.solved .wp-tri{opacity:1;}
+  [data-mode="quiz"] .wp.solved .wp-label,[data-mode="quiz"] .wp.solved .wp-sublabel{opacity:1;fill:var(--good);}
+  [data-mode="quiz"] .wp.reveal .wp-label,[data-mode="quiz"] .wp.reveal .wp-sublabel{opacity:1;fill:var(--bad);}
+
+  [data-mode="drag"] .wp .wp-badge,[data-mode="drag"] .wp .wp-tri{opacity:0;}
+  [data-mode="drag"] .wp .wp-slot{opacity:1;stroke-dasharray:2.5 3;cursor:pointer;}
+  [data-mode="drag"] .wp.solved .wp-badge,[data-mode="drag"] .wp.solved .wp-tri{opacity:1;}
+  [data-mode="drag"] .wp.solved .wp-slot{opacity:1;stroke:var(--good);stroke-dasharray:none;}
+  [data-mode="drag"] .wp.solved .wp-label,[data-mode="drag"] .wp.solved .wp-sublabel{opacity:1;fill:var(--good);}
+  [data-mode="drag"] .wp.wrong-flash .wp-slot{stroke:var(--bad);animation:shake .35s;}
+
+  @keyframes pulse{0%,100%{r:15;opacity:1;}50%{r:19;opacity:.55;}}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-3px);}75%{transform:translateX(3px);}}
+</style>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <button class="backbtn" id="backBtn" hidden aria-label="Назад">←</button>
+    <div class="brand">
+      <div class="mark">🧭</div>
+      <div class="titles">
+        <b id="topTitle">Штурман МВЗ</b>
+        <span id="topSub">UUWV · Московская воздушная зона</span>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="statchip" id="statChip" hidden></div>
+  </div>
+
+  <div class="modebar" id="modeBar">
+    <button class="modebtn" data-set-mode="study">Изучить</button>
+    <button class="modebtn" data-set-mode="quiz">Подписать точки</button>
+    <button class="modebtn" data-set-mode="drag">Собрать на карте</button>
+  </div>
+
+  <div class="body-grid" id="bodyGrid" hidden>
+    <div class="stage">
+      <svg id="scope" viewBox="0 0 800 800" data-mode="study"></svg>
+      <div class="toolbar">
+        <button class="toolbtn" id="fitBtn" title="Показать всю схему">⛶</button>
+        <div class="zoomgroup">
+          <button class="toolbtn" id="zoomInBtn" title="Приблизить">+</button>
+          <button class="toolbtn" id="zoomOutBtn" title="Отдалить">−</button>
+        </div>
+        <button class="toolbtn" id="gridBtn" title="Показать/скрыть кольца дальности">⊙</button>
+      </div>
+      <div class="legend">
+        <span class="sid"><i></i>SID · выход</span>
+        <span class="star"><i></i>STAR · вход</span>
+      </div>
+      <div class="tooltip" id="tooltip" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-inner" id="panelStudy">
+        <div class="panel-title">Изучение</div>
+        <p class="prompt">Коснитесь точки на схеме — появятся её координаты и азимут/дальность от Внуково. Синим — точки SID (выход из МВЗ), зелёным — STAR (вход в МВЗ).</p>
+      </div>
+
+      <div class="panel-inner" id="panelQuiz" hidden>
+        <div class="panel-title">Подписать точки</div>
+        <div class="progressbar"><i id="quizProgressBar" style="width:0%"></i></div>
+        <div class="prompt" id="quizPrompt">Как называется выделенная точка?</div>
+        <div class="qinput" id="qinputRow">
+          <input id="quizInput" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="код точки" aria-label="Код точки">
+          <button class="btn primary" id="quizSubmit">Ответить</button>
+        </div>
+        <div class="choices" id="quizChoices" hidden></div>
+        <div class="feedback" id="quizFeedback"></div>
+        <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;">
+          <button class="linklike" id="hintToggle">Показать варианты ответа</button>
+          <button class="btn ghost" id="quizNext" hidden>Далее →</button>
+        </div>
+      </div>
+
+      <div class="panel-inner" id="panelDrag" hidden>
+        <div class="panel-title">Собрать на карте</div>
+        <div class="progressbar"><i id="dragProgressBar" style="width:0%"></i></div>
+        <p class="prompt">Перетащите (или выберите, затем коснитесь точки на схеме) — <b id="dragCount">0 / 0</b> размещено.</p>
+        <div class="tray" id="tray"></div>
+      </div>
+
+      <div class="panel-inner results" id="panelResults" hidden>
+        <div class="panel-title">Результат</div>
+        <div class="stat-grid">
+          <div class="stat"><b id="resPct" class="tnum">0%</b><span>точность</span></div>
+          <div class="stat"><b id="resTime" class="tnum">0:00</b><span>время</span></div>
+          <div class="stat"><b id="resMistakes" class="tnum">0</b><span>ошибок</span></div>
+        </div>
+        <div id="resMissedWrap" hidden>
+          <div class="panel-title" style="margin-bottom:6px;">Стоит повторить</div>
+          <div class="missed-list" id="resMissedList"></div>
+        </div>
+        <button class="btn primary block" id="resRepeatMissed" hidden>Повторить только ошибки</button>
+        <button class="btn ghost block" id="resRestart">Пройти ещё раз</button>
+        <button class="btn ghost block" id="resMenu">В меню упражнений</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu" id="menu">
+    <div class="menu-hero">
+      <div class="eyebrow">UUWV · Москва, узловой диспетчерский район</div>
+      <h1>Штурман МВЗ</h1>
+      <p>Тренажёр для запоминания структуры Московской воздушной зоны и аэропорта Внуково — точки, азимуты и дальности, собранные по реальным координатам.</p>
+    </div>
+    <div class="cards" id="cardList"></div>
+    <div class="menu-foot">
+      Координаты точек — из AIP России, раздел UUWW AD 2.1: «Координаты точек пути RNAV» (цикл AIRAC AMDT 05/23) и карты SID/STAR Внуково, стр. 139–160 (циклы 11 JUL 24 / 05 SEP 24). Маршруты SID/STAR показаны по одному представительному варианту на точку выхода/входа — без деления по ВПП и категориям ВС, которое есть в оригинале. Пунктир на схеме МВЗ лишь соединяет точки по порядку азимута для наглядности — это не настоящая форма границы зоны, её изломы не всегда проходят через эти точки. Со временем точки и схемы могут меняться — сверяйте с актуальным AIP перед реальными полётами. Тренажёр не предназначен для навигации.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= DATA ================= */
+  // Центр схемы — не Внуково, а центр Москвы (МВЗ охватывает все аэропорты узла, а не один из них).
+  const MOSCOW_CENTER = {lat:55.7558, lon:37.6173};
+  // Внуково (UUWW) — для расчёта азимута/дальности во всплывающей подсказке (среднее MAPt всех ВПП, AIP UUWW AD 2.1).
+  const UUWW = {lat:55.595714, lon:37.265853};
+  const AIRPORTS = [
+    {icao:'UUWW', name:'ВНУКОВО', lat:55.595714, lon:37.265853, primary:true},
+    {icao:'UUEE', name:'Шереметьево', lat:55.972642, lon:37.414589},
+    {icao:'UUDD', name:'Домодедово', lat:55.408611, lon:37.906111},
+  ];
+
+  // Разбор координат в формате AIP (ДДММСС.сс[N/S], ДДДММСС.сс[E/W]) — без ручного перевода в десятичные градусы,
+  // чтобы координаты в коде совпадали с тем, что напечатано в первоисточнике.
+  function dms(s){
+    const m = s.match(/^(\d{2,3})(\d{2})(\d{2}(?:\.\d+)?)([NSEW])$/);
+    let v = (+m[1]) + (+m[2])/60 + (+m[3])/3600;
+    if(m[4]==='S'||m[4]==='W') v = -v;
+    return v;
+  }
+  function pt(latDMS, lonDMS){ return {lat:dms(latDMS), lon:dms(lonDMS)}; }
+
+  // Точки входа/выхода МВЗ, используемые SID/STAR Внуково — состав и роль (SID/STAR)
+  // сверены по официальной схеме маршрутов (не по одной лишь таблице координат AIP UUWW AD 2.1, AIRAC AMDT 05/23).
+  const MVZ_POINTS = [
+    {name:'ROMTA', lat:57.1078, lon:37.7119, type:'STAR'},
+    {name:'RILPO', lat:56.8722, lon:38.2706, type:'SID'},
+    {name:'KOGOM', lat:55.9925, lon:39.6678, type:'SID'},
+    {name:'DIMGI', lat:55.7944, lon:39.8111, type:'STAR'},
+    {name:'TOGMO', lat:54.3883, lon:39.0253, type:'SID'},
+    {name:'OLOPI', lat:54.2333, lon:38.8981, type:'STAR'},
+    {name:'EMGAS', lat:54.4578, lon:37.8386, type:'SID'},
+    {name:'LEKDO', lat:54.6147, lon:37.2611, type:'STAR'},
+    {name:'SOTOG', lat:54.7333, lon:36.6481, type:'SID'},
+    {name:'BILRU', lat:55.3894, lon:35.5750, type:'STAR'},
+    {name:'POKAG', lat:55.6322, lon:35.5503, type:'SID'},
+    {name:'SUNUN', lat:56.1492, lon:36.1244, type:'SID'},
+    {name:'BEKIP', lat:56.5833, lon:36.6522, type:'STAR'},
+    {name:'OLMUN', ...pt('560439.00N','0393303.00E'), type:'SID'},
+  ];
+
+  // Промежуточные точки схем SID/STAR Внуково (не входят в кольцо МВЗ выше) — координаты и последовательность
+  // читаются напрямую с карт AIP UUWW AD 2.1: SID стр.139-154, STAR стр.155-160, цикл 11 JUL 24 / 05 SEP 24.
+  const EXTRA_POINTS = {
+    WW016: pt('552505.11N','0371058.85E'), WW017: pt('554039.30N','0371938.81E'),
+    WW018: pt('553915.77N','0372519.97E'), WW019: pt('553426.75N','0372929.75E'),
+    BITSA: pt('553400.00N','0373653.00E'), GEKLA: pt('553900.00N','0375205.00E'),
+    UNRUM: pt('553652.80N','0380842.50E'), ABVIV: pt('553431.00N','0382710.00E'),
+    KORFI: pt('553745.60N','0383656.70E'), MEFED: pt('554400.90N','0385557.00E'),
+    UDZOK: pt('555056.00N','0390900.00E'), BINPI: pt('555540.60N','0391804.30E'),
+    REMLI: pt('552150.00N','0373247.70E'), SOMAG: pt('551627.20N','0373939.90E'),
+    LIFAS: pt('551000.00N','0374753.00E'), SURZA: pt('550615.90N','0375440.00E'),
+    BABUT: pt('550242.90N','0380106.80E'), POZUK: pt('545102.90N','0382156.20E'),
+    OMEZA: pt('544546.70N','0383813.70E'), FEGRA: pt('543658.00N','0384723.90E'),
+    OFIRA: pt('545952.50N','0374336.10E'), RIREN: pt('545330.80N','0374615.20E'),
+    LAZIT: pt('543914.50N','0374934.00E'), SODLE: pt('551847.90N','0370654.70E'),
+    PIZUR: pt('551300.00N','0365953.00E'), TITAP: pt('550802.20N','0365614.50E'),
+    NIDOL: pt('545850.30N','0364932.30E'), LILGA: pt('544938.10N','0364253.10E'),
+    LIKNI: pt('553833.80N','0370134.30E'), GIGUN: pt('554407.00N','0365729.90E'),
+    NUZOR: pt('554903.80N','0365342.80E'), DUFAR: pt('555937.70N','0365408.60E'),
+    TIRDE: pt('560708.00N','0370254.20E'), TAFAZ: pt('561508.00N','0371731.00E'),
+    KOMNI: pt('562337.70N','0372407.70E'), GORNA: pt('563742.90N','0375006.10E'),
+    OSGAK: pt('564130.60N','0375649.20E'), DEFAL: pt('555443.60N','0364528.70E'),
+    RIZNO: pt('560519.30N','0363045.80E'), PUFIK: pt('555008.20N','0364441.10E'),
+    ITVIN: pt('554546.00N','0362901.00E'), NUKDI: pt('552059.80N','0355456.50E'),
+    PREKI: pt('551742.80N','0362249.70E'), LERTE: pt('551552.00N','0363714.00E'),
+    ORSIF: pt('551605.00N','0365816.00E'), RORUK: pt('551858.90N','0372213.90E'),
+    TAZOL: pt('564009.10N','0372319.30E'), SUBOD: pt('563208.90N','0371716.00E'),
+    FAMLA: pt('561746.90N','0370704.60E'), AGMER: pt('562609.40N','0371307.10E'),
+    ODNEL: pt('555609.20N','0365550.80E'), ASLEK: pt('553542.80N','0365950.90E'),
+    BUPOS: pt('552421.00N','0365950.90E'), SORUK: pt('561825.40N','0364618.00E'),
+    VIVZO: pt('554601.00N','0392403.00E'), LOGPU: pt('554255.00N','0384149.00E'),
+    DUZEV: pt('554150.00N','0382732.00E'), OTSUR: pt('554044.20N','0381319.50E'),
+    ENMUR: pt('553310.00N','0373419.00E'), KIBUR: pt('552744.46N','0373306.02E'),
+    RIFMA: pt('542928.70N','0384039.20E'), OKPEN: pt('544355.50N','0382807.20E'),
+    TEBDI: pt('550311.80N','0373144.10E'), TEPTA: pt('550141.70N','0372113.80E'),
+    FIDOT: pt('551300.00N','0372153.00E'), REKRO: pt('544532.00N','0372022.70E'),
+    OZLER: pt('545513.89N','0372051.60E'), TADUT: pt('551300.80N','0370148.30E'),
+    TOLKE: pt('550726.50N','0370439.90E'), RONEZ: pt('550319.60N','0371138.80E'),
+  };
+
+  const GATE_LOOKUP = Object.fromEntries(MVZ_POINTS.map(p=>[p.name,{lat:p.lat,lon:p.lon}]));
+  function lookupCoord(name){ return GATE_LOOKUP[name] || EXTRA_POINTS[name]; }
+
+  // Общий начальный участок SID показан по варианту RWY 01 (WW017-WW018-WW019); вариант RWY 06 (через WW063)
+  // ведёт к тем же воротам почти той же трассой и здесь для простоты не дублируется.
+  const SID_ROUTES = [
+    {gate:'KOGOM', path:['WW017','WW018','WW019','BITSA','GEKLA','UNRUM','ABVIV','KORFI','MEFED','UDZOK','BINPI','KOGOM']},
+    {gate:'OLMUN', path:['WW017','WW018','WW019','BITSA','GEKLA','UNRUM','ABVIV','KORFI','MEFED','UDZOK','BINPI','OLMUN']},
+    {gate:'TOGMO', path:['WW017','WW018','WW019','REMLI','SOMAG','LIFAS','SURZA','BABUT','POZUK','OMEZA','FEGRA','TOGMO']},
+    {gate:'EMGAS', path:['WW017','WW018','WW019','REMLI','SOMAG','OFIRA','RIREN','LAZIT','EMGAS']},
+    {gate:'SOTOG', path:['WW017','WW018','WW019','WW016','SODLE','PIZUR','TITAP','NIDOL','LILGA','SOTOG']},
+    {gate:'RILPO', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DUFAR','TIRDE','TAFAZ','KOMNI','GORNA','OSGAK','RILPO']},
+    {gate:'SUNUN', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DEFAL','RIZNO','SUNUN']},
+    {gate:'POKAG', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DEFAL','PUFIK','ITVIN','POKAG']},
+  ];
+
+  // Все STAR сходятся к RORUK (IAF). BEKIP присоединяется к общему стволу ROMTA в районе FAMLA.
+  const STAR_ROUTES = [
+    {gate:'BILRU', path:['BILRU','NUKDI','PREKI','LERTE','ORSIF','RORUK']},
+    {gate:'ROMTA', path:['ROMTA','TAZOL','SUBOD','FAMLA','AGMER','ODNEL','GIGUN','ASLEK','BUPOS','ORSIF','RORUK']},
+    {gate:'BEKIP', path:['BEKIP','SORUK','FAMLA','AGMER','ODNEL','GIGUN','ASLEK','BUPOS','ORSIF','RORUK']},
+    {gate:'DIMGI', path:['DIMGI','VIVZO','MEFED','LOGPU','DUZEV','OTSUR','GEKLA','ENMUR','KIBUR','RORUK']},
+    {gate:'OLOPI', path:['OLOPI','RIFMA','OKPEN','POZUK','TEBDI','TEPTA','FIDOT','RORUK']},
+    {gate:'LEKDO', path:['LEKDO','REKRO','OZLER','TADUT','TOLKE','RONEZ','TEPTA','FIDOT','RORUK']},
+  ];
+
+  function pointsFromRoutes(routes, type){
+    const seen = new Map();
+    routes.forEach(r=>r.path.forEach(name=>{
+      if(seen.has(name)) return;
+      const c = lookupCoord(name);
+      if(!c) return;
+      seen.set(name, {name, lat:c.lat, lon:c.lon, type});
+    }));
+    return [...seen.values()];
+  }
+  const SID_POINTS = pointsFromRoutes(SID_ROUTES, 'SID');
+  const STAR_POINTS = pointsFromRoutes(STAR_ROUTES, 'STAR');
+
+  function ruPlural(n, one, few, many){
+    const n100 = Math.abs(n)%100, n10 = n100%10;
+    if(n100>10 && n100<20) return many;
+    if(n10>1 && n10<5) return few;
+    if(n10===1) return one;
+    return many;
+  }
+  function ptWord(n){ return `${n} ${ruPlural(n,'точка','точки','точек')}`; }
+
+  const EXERCISES = [
+    {id:'mvz-gates', title:'Точки входа и выхода МВЗ', desc:`${ptWord(MVZ_POINTS.length)} SID/STAR Внуково на границе зоны`, icon:'⛶', locked:false,
+      points:MVZ_POINTS, routes:null, ringHint:true,
+      note:'Коснитесь точки на схеме — появятся её координаты и азимут/дальность от Внуково. Синим — точки SID (выход из МВЗ), зелёным — STAR (вход в МВЗ). Пунктир просто соединяет точки по порядку азимута — это не настоящая форма границы МВЗ.'},
+    {id:'sid-uuww', title:'SID Внуково', desc:`${ptWord(SID_POINTS.length)} по 8 схемам вылета`, icon:'↗', locked:false,
+      points:SID_POINTS, routes:SID_ROUTES,
+      note:'Линии — реальные маршруты вылета по AIP (общий для всех участок от Внуково показан по варианту RWY 01). Коснитесь точки — увидите координаты и азимут/дальность от Внуково.'},
+    {id:'star-uuww', title:'STAR Внуково', desc:`${ptWord(STAR_POINTS.length)} по 6 схемам прилёта`, icon:'↘', locked:false,
+      points:STAR_POINTS, routes:STAR_ROUTES,
+      note:'Линии — реальные маршруты прилёта по AIP, все сходятся к точке RORUK (IAF). Коснитесь точки — увидите координаты и азимут/дальность от Внуково.'},
+    {id:'ad-uuww', title:'Схема аэродрома Внуково', desc:'ВПП, РД, стоянки', icon:'▦', locked:true},
+  ];
+
+  /* ================= GEO ================= */
+  const toRad = d => d*Math.PI/180, toDeg = r => r*180/Math.PI;
+
+  function bearingDistNm(lat1,lon1,lat2,lon2){
+    const R=3440.065;
+    const p1=toRad(lat1), p2=toRad(lat2);
+    const dp=toRad(lat2-lat1), dl=toRad(lon2-lon1);
+    const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    const dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    const y=Math.sin(dl)*Math.cos(p2);
+    const x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+    const brg=(toDeg(Math.atan2(y,x))+360)%360;
+    return {brg,dist};
+  }
+
+  function toDMS(deg,isLat){
+    const hemi = isLat ? (deg>=0?'N':'S') : (deg>=0?'E':'W');
+    const ad=Math.abs(deg), d=Math.floor(ad), mf=(ad-d)*60, m=Math.floor(mf), s=((mf-m)*60).toFixed(1);
+    return `${String(d).padStart(isLat?2:3,'0')}°${String(m).padStart(2,'0')}'${s.padStart(4,'0')}"${hemi}`;
+  }
+
+  const CX=400, CY=400;
+  let ACTIVE_POINTS = MVZ_POINTS, ACTIVE_ROUTES = null;
+  let maxDist, SCALE;
+  function recomputeScale(){
+    maxDist = Math.max(...ACTIVE_POINTS.map(p=>bearingDistNm(MOSCOW_CENTER.lat,MOSCOW_CENTER.lon,p.lat,p.lon).dist));
+    SCALE = 340/(Math.ceil((maxDist+5)/20)*20);
+  }
+
+  function project(lat,lon){
+    const {brg,dist} = bearingDistNm(MOSCOW_CENTER.lat,MOSCOW_CENTER.lon,lat,lon);
+    const rad = toRad(brg);
+    return {x:CX+dist*SCALE*Math.sin(rad), y:CY-dist*SCALE*Math.cos(rad), brg, dist};
+  }
+
+  /* ================= SCOPE RENDER ================= */
+  const scopeSvg = document.getElementById('scope');
+
+  function buildScope(){
+    recomputeScale();
+    const ringMax = Math.ceil((maxDist+5)/20)*20;
+    let bg = '';
+    for(let r=20; r<=ringMax; r+=20){
+      const rp = r*SCALE;
+      bg += `<circle class="ring" cx="${CX}" cy="${CY}" r="${rp}"></circle>`;
+      bg += `<text class="ring-label" x="${CX+6}" y="${CY-rp-4}">${r} NM</text>`;
+    }
+    const dirs = [['N',0],['NE',45],['E',90],['SE',135],['S',180],['SW',225],['W',270],['NW',315]];
+    dirs.forEach(([label,deg])=>{
+      const rad=toRad(deg);
+      const x2=CX+(ringMax*SCALE)*Math.sin(rad), y2=CY-(ringMax*SCALE)*Math.cos(rad);
+      bg += `<line class="spoke" x1="${CX}" y1="${CY}" x2="${x2}" y2="${y2}"></line>`;
+      const lx=CX+(ringMax*SCALE+18)*Math.sin(rad), ly=CY-(ringMax*SCALE+18)*Math.cos(rad);
+      bg += `<text class="spoke-label" x="${lx}" y="${ly+4}">${label}</text>`;
+    });
+
+    if(ACTIVE_ROUTES){
+      ACTIVE_ROUTES.forEach(r=>{
+        const coords = r.path.map(lookupCoord).filter(Boolean);
+        if(coords.length<2) return;
+        const d = coords.map((c,i)=>{
+          const {x,y} = project(c.lat,c.lon);
+          return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+        }).join(' ');
+        bg += `<path class="route-line" d="${d}"></path>`;
+      });
+    } else if(currentEx && currentEx.ringHint){
+      const sorted = ACTIVE_POINTS.map(p=>({...p, ...project(p.lat,p.lon)})).sort((a,b)=>a.brg-b.brg);
+      const d = sorted.map((p,i)=>(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ') + ' Z';
+      bg += `<path class="ring-hint" d="${d}"></path>`;
+    }
+
+    AIRPORTS.forEach(ap=>{
+      const {x,y} = project(ap.lat,ap.lon);
+      if(ap.primary){
+        bg += `<g class="ap primary" transform="translate(${x},${y})">
+          <circle class="ap-outer" r="16"></circle>
+          <circle class="ap-inner" r="10"></circle>
+          <text y="27">${ap.icao}</text>
+        </g>`;
+      } else {
+        bg += `<g class="ap" transform="translate(${x},${y})">
+          <circle r="6"></circle>
+          <text y="19">${ap.icao}</text>
+        </g>`;
+      }
+    });
+
+    let pts = '';
+    ACTIVE_POINTS.forEach(p=>{
+      const {x,y} = project(p.lat,p.lon);
+      const sub = `UUWW ${p.type}`;
+      pts += `<g class="wp" data-name="${p.name}" data-type="${p.type}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})">
+        <circle class="wp-hit" r="22"></circle>
+        <circle class="wp-slot"></circle>
+        <circle class="wp-badge"></circle>
+        <path class="wp-tri" d="M0,-6.5 L5.6,4.5 L-5.6,4.5 Z"></path>
+        <text class="wp-label" y="29">${p.name}</text>
+        <text class="wp-sublabel" y="41">${sub}</text>
+      </g>`;
+    });
+
+    scopeSvg.innerHTML = `<g id="bgLayer">${bg}</g><g id="ptLayer">${pts}</g>`;
+
+    const legendSid = document.querySelector('.legend .sid'), legendStar = document.querySelector('.legend .star');
+    legendSid.hidden = !ACTIVE_POINTS.some(p=>p.type==='SID');
+    legendStar.hidden = !ACTIVE_POINTS.some(p=>p.type==='STAR');
+    resetView();
+  }
+
+  /* ================= ZOOM / PAN ================= */
+  let vb = {x:0, y:0, w:800, h:800};
+  const VB_MIN = 800/8, VB_MAX = 800;
+  function setViewBox(){ scopeSvg.setAttribute('viewBox', `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`); }
+  function resetView(){ vb = {x:0, y:0, w:800, h:800}; setViewBox(); }
+  function screenToSvgPoint(clientX, clientY){
+    const rect = scopeSvg.getBoundingClientRect();
+    const fx = (clientX-rect.left)/rect.width, fy = (clientY-rect.top)/rect.height;
+    return {x: vb.x+fx*vb.w, y: vb.y+fy*vb.h};
+  }
+  function zoomAt(factor, clientX, clientY){
+    const p = screenToSvgPoint(clientX, clientY);
+    let newW = Math.min(VB_MAX, Math.max(VB_MIN, vb.w/factor));
+    const applied = vb.w/newW;
+    vb.x = p.x - (p.x-vb.x)/applied;
+    vb.y = p.y - (p.y-vb.y)/applied;
+    vb.w = newW; vb.h = newW;
+    setViewBox();
+  }
+  function panByScreenPx(dx, dy){
+    const rect = scopeSvg.getBoundingClientRect();
+    vb.x -= dx*(vb.w/rect.width);
+    vb.y -= dy*(vb.h/rect.height);
+    setViewBox();
+  }
+  function zoomAtCenter(factor){
+    const rect = scopeSvg.getBoundingClientRect();
+    zoomAt(factor, rect.left+rect.width/2, rect.top+rect.height/2);
+  }
+  document.getElementById('fitBtn').addEventListener('click', resetView);
+  document.getElementById('zoomInBtn').addEventListener('click', ()=>zoomAtCenter(1.5));
+  document.getElementById('zoomOutBtn').addEventListener('click', ()=>zoomAtCenter(1/1.5));
+  scopeSvg.addEventListener('wheel', e=>{
+    e.preventDefault();
+    zoomAt(e.deltaY<0?1.18:1/1.18, e.clientX, e.clientY);
+  }, {passive:false});
+
+  function setScopeMode(mode){ scopeSvg.setAttribute('data-mode', mode); }
+  function markerFor(name){ return scopeSvg.querySelector(`.wp[data-name="${name}"]`); }
+  function allMarkers(){ return [...scopeSvg.querySelectorAll('.wp')]; }
+  function clearMarkerStates(){ allMarkers().forEach(m=>m.classList.remove('target','solved','reveal','wrong-flash')); }
+
+  /* ================= TOOLTIP (study mode) ================= */
+  const tooltip = document.getElementById('tooltip');
+  function showTooltipFor(name){
+    const p = ACTIVE_POINTS.find(p=>p.name===name);
+    if(!p){ tooltip.hidden = true; return; }
+    const fromVko = bearingDistNm(UUWW.lat,UUWW.lon,p.lat,p.lon);
+    tooltip.innerHTML = `<div class="name" data-type="${p.type}">${p.name} <span class="typebadge">${p.type==='SID'?'SID · выход':'STAR · вход'}</span></div>
+      <div class="row"><span>Широта</span><b>${toDMS(p.lat,true)}</b></div>
+      <div class="row"><span>Долгота</span><b>${toDMS(p.lon,false)}</b></div>
+      <div class="row"><span>От Внуково</span><b>${fromVko.brg.toFixed(0)}° / ${fromVko.dist.toFixed(0)} nm</b></div>`;
+    tooltip.hidden = false;
+  }
+
+  function handleScopeTap(wp, clientX, clientY){
+    const mode = scopeSvg.getAttribute('data-mode');
+    if(mode==='study'){
+      if(!wp){ tooltip.hidden = true; return; }
+      showTooltipFor(wp.dataset.name);
+    } else if(mode==='drag'){
+      if(!armedChip || !wp || wp.classList.contains('solved')) return;
+      attemptPlace(armedChip.dataset.name, armedChip, clientX, clientY, wp);
+      armedChip.classList.remove('armed'); armedChip = null;
+    }
+  }
+
+  /* ---- unified pointer handling on the scope: pan (1 finger/mouse), pinch-zoom (2 fingers), tap ---- */
+  const scopePointers = new Map();
+  let scopePan = null, scopePinchDist = null;
+  scopeSvg.addEventListener('pointerdown', e=>{
+    scopePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if(scopePointers.size === 1){
+      scopePan = {x:e.clientX, y:e.clientY, moved:false, wp:e.target.closest('.wp')};
+    } else if(scopePointers.size === 2){
+      scopePan = null;
+      const pts = [...scopePointers.values()];
+      scopePinchDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+    }
+  });
+  scopeSvg.addEventListener('pointermove', e=>{
+    if(!scopePointers.has(e.pointerId)) return;
+    scopePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if(scopePointers.size === 2 && scopePinchDist){
+      const pts = [...scopePointers.values()];
+      const dist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if(dist>0 && scopePinchDist>0){
+        const midX=(pts[0].x+pts[1].x)/2, midY=(pts[0].y+pts[1].y)/2;
+        zoomAt(dist/scopePinchDist, midX, midY);
+      }
+      scopePinchDist = dist;
+    } else if(scopePan){
+      const dx=e.clientX-scopePan.x, dy=e.clientY-scopePan.y;
+      if(!scopePan.moved && Math.hypot(dx,dy)>6) scopePan.moved = true;
+      if(scopePan.moved){
+        panByScreenPx(dx, dy);
+        scopePan.x = e.clientX; scopePan.y = e.clientY;
+      }
+    }
+  });
+  function scopePointerEnd(e){
+    scopePointers.delete(e.pointerId);
+    if(scopePointers.size < 2) scopePinchDist = null;
+    if(scopePan && !scopePan.moved){
+      handleScopeTap(scopePan.wp, e.clientX, e.clientY);
+    }
+    if(scopePointers.size === 0) scopePan = null;
+  }
+  scopeSvg.addEventListener('pointerup', scopePointerEnd);
+  scopeSvg.addEventListener('pointercancel', scopePointerEnd);
+
+  document.getElementById('gridBtn').addEventListener('click', ()=>{
+    const bgLayer = document.getElementById('bgLayer');
+    bgLayer.style.opacity = bgLayer.style.opacity === '0' ? '1' : '0';
+  });
+
+  /* ================= APP SHELL / ROUTING ================= */
+  const menuEl = document.getElementById('menu');
+  const bodyGrid = document.getElementById('bodyGrid');
+  const modeBar = document.getElementById('modeBar');
+  const backBtn = document.getElementById('backBtn');
+  const topTitle = document.getElementById('topTitle');
+  const topSub = document.getElementById('topSub');
+  const statChip = document.getElementById('statChip');
+  const cardList = document.getElementById('cardList');
+
+  const panels = {
+    study: document.getElementById('panelStudy'),
+    quiz: document.getElementById('panelQuiz'),
+    drag: document.getElementById('panelDrag'),
+    results: document.getElementById('panelResults'),
+  };
+
+  const STORE_KEY = 'shturman-mvz:v1';
+  function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; } }
+  function saveStore(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+  function recordBest(exId, mode, pct, ms){
+    const s = loadStore();
+    s[exId] = s[exId] || {};
+    const cur = s[exId][mode];
+    if(!cur || pct > cur.pct || (pct === cur.pct && ms < cur.ms)){
+      s[exId][mode] = {pct, ms};
+    }
+    saveStore(s);
+  }
+
+  function fmtTime(ms){
+    const s = Math.round(ms/1000);
+    return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  }
+
+  function renderMenu(){
+    const store = loadStore();
+    cardList.innerHTML = EXERCISES.map(ex=>{
+      const badges = [];
+      const rec = store[ex.id];
+      if(rec){
+        if(rec.quiz) badges.push(`<span class="badge">Подписать: ${rec.quiz.pct}%</span>`);
+        if(rec.drag) badges.push(`<span class="badge">Собрать: ${rec.drag.pct}%</span>`);
+      }
+      return `<button class="card ${ex.locked?'locked':''}" data-ex="${ex.id}" ${ex.locked?'disabled':''}>
+        <div class="icon">${ex.icon}</div>
+        <div class="body">
+          <h3>${ex.title}</h3>
+          <p>${ex.desc}</p>
+          ${badges.length?`<div class="progress-badges">${badges.join('')}</div>`:''}
+        </div>
+        <div class="pill ${ex.locked?'soon':''}">${ex.locked?'скоро':ptWord(ex.points.length)}</div>
+      </button>`;
+    }).join('');
+    cardList.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        const ex = EXERCISES.find(e=>e.id===card.dataset.ex);
+        if(ex.locked) return;
+        openExercise(ex);
+      });
+    });
+  }
+  renderMenu();
+
+  let currentEx = null;
+
+  function openExercise(ex){
+    currentEx = ex;
+    ACTIVE_POINTS = ex.points;
+    ACTIVE_ROUTES = ex.routes || null;
+    buildScope();
+    document.getElementById('panelStudy').querySelector('.prompt').textContent = ex.note;
+    menuEl.hidden = true;
+    bodyGrid.hidden = false;
+    modeBar.classList.add('show');
+    backBtn.hidden = false;
+    topTitle.textContent = ex.title;
+    switchMode('study');
+  }
+
+  function backToMenu(){
+    bodyGrid.hidden = true;
+    modeBar.classList.remove('show');
+    backBtn.hidden = true;
+    topTitle.textContent = 'Штурман МВЗ';
+    topSub.textContent = 'UUWV · Московская воздушная зона';
+    statChip.hidden = true;
+    menuEl.hidden = false;
+    renderMenu();
+  }
+  backBtn.addEventListener('click', backToMenu);
+  document.getElementById('resMenu').addEventListener('click', backToMenu);
+
+  function switchMode(mode){
+    Object.values(panels).forEach(p=>p.hidden = true);
+    modeBar.querySelectorAll('.modebtn').forEach(b=>b.classList.toggle('active', b.dataset.setMode===mode));
+    clearMarkerStates();
+    tooltip.hidden = true;
+    if(mode==='study'){ panels.study.hidden=false; setScopeMode('study'); topSub.textContent='Изучение карты'; statChip.hidden=true; }
+    if(mode==='quiz'){ panels.quiz.hidden=false; setScopeMode('quiz'); topSub.textContent='Подписать точки'; startQuiz(); }
+    if(mode==='drag'){ panels.drag.hidden=false; setScopeMode('drag'); topSub.textContent='Собрать на карте'; startDrag(); }
+  }
+  modeBar.querySelectorAll('.modebtn').forEach(b=>{
+    b.addEventListener('click', ()=>switchMode(b.dataset.setMode));
+  });
+
+  function showResults({pct, ms, mistakes, missed, mode}){
+    Object.values(panels).forEach(p=>p.hidden = true);
+    panels.results.hidden = false;
+    document.getElementById('resPct').textContent = pct+'%';
+    document.getElementById('resTime').textContent = fmtTime(ms);
+    document.getElementById('resMistakes').textContent = mistakes;
+    const missedWrap = document.getElementById('resMissedWrap');
+    const repeatBtn = document.getElementById('resRepeatMissed');
+    if(missed && missed.length){
+      missedWrap.hidden = false;
+      repeatBtn.hidden = false;
+      document.getElementById('resMissedList').innerHTML = missed.map(n=>`<span>${n}</span>`).join('');
+      repeatBtn.onclick = ()=>{ if(mode==='quiz') startQuiz(missed); else startDrag(missed); };
+    } else {
+      missedWrap.hidden = true;
+      repeatBtn.hidden = true;
+    }
+    document.getElementById('resRestart').onclick = ()=> mode==='quiz' ? startQuiz() : startDrag();
+    if(currentEx) recordBest(currentEx.id, mode, pct, ms);
+    renderMenu();
+  }
+
+  /* ================= QUIZ MODE ================= */
+  const quizInput = document.getElementById('quizInput');
+  const quizFeedback = document.getElementById('quizFeedback');
+  const quizChoices = document.getElementById('quizChoices');
+  const quizNextBtn = document.getElementById('quizNext');
+  const hintToggle = document.getElementById('hintToggle');
+  function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+  function safeSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){} }
+  let hintMode = safeGet('shturman-mvz:hint') === '1';
+  hintToggle.textContent = hintMode ? 'Печатать ответ вручную' : 'Показать варианты ответа';
+
+  let quizQueue=[], quizIdx=0, quizMistakes=0, quizMissed=[], quizStart=0, itemMissed=false, firstTryCorrect=0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
+  function startQuiz(subset){
+    const list = subset ? ACTIVE_POINTS.filter(p=>subset.includes(p.name)) : ACTIVE_POINTS;
+    quizQueue = shuffle(list);
+    quizIdx = 0; quizMistakes = 0; quizMissed = []; firstTryCorrect = 0;
+    quizStart = Date.now();
+    panels.quiz.hidden = false; panels.results.hidden = true;
+    setScopeMode('quiz');
+    nextQuizItem();
+  }
+
+  function updateQuizProgress(){
+    document.getElementById('quizProgressBar').style.width = (quizIdx/quizQueue.length*100)+'%';
+  }
+
+  function nextQuizItem(){
+    if(quizIdx >= quizQueue.length) return finishQuiz();
+    itemMissed = false;
+    clearMarkerStates();
+    const p = quizQueue[quizIdx];
+    markerFor(p.name).classList.add('target');
+    quizInput.value=''; quizInput.disabled=false;
+    quizFeedback.textContent=''; quizFeedback.className='feedback';
+    quizNextBtn.hidden = true;
+    updateQuizProgress();
+    if(hintMode) renderChoices(p); else { quizChoices.hidden=true; quizInput.focus(); }
+  }
+
+  function renderChoices(target){
+    quizChoices.hidden = false;
+    document.getElementById('qinputRow').style.display = 'none';
+    const others = ACTIVE_POINTS.filter(p=>p.name!==target.name)
+      .map(p=>({name:p.name, d:Math.min(Math.abs(project(p.lat,p.lon).brg-project(target.lat,target.lon).brg), 360-Math.abs(project(p.lat,p.lon).brg-project(target.lat,target.lon).brg))}))
+      .sort((a,b)=>a.d-b.d).slice(0,3).map(o=>o.name);
+    const opts = shuffle([target.name, ...others]);
+    quizChoices.innerHTML = opts.map(n=>`<button class="choice" data-n="${n}">${n}</button>`).join('');
+    quizChoices.querySelectorAll('.choice').forEach(b=>{
+      b.addEventListener('click', ()=>submitAnswer(b.dataset.n));
+    });
+  }
+
+  document.getElementById('qinputRow').style.display = '';
+  function useTextInput(){
+    quizChoices.hidden = true;
+    document.getElementById('qinputRow').style.display = '';
+  }
+
+  hintToggle.addEventListener('click', ()=>{
+    hintMode = !hintMode;
+    safeSet('shturman-mvz:hint', hintMode?'1':'0');
+    hintToggle.textContent = hintMode ? 'Печатать ответ вручную' : 'Показать варианты ответа';
+    if(quizQueue.length && quizIdx < quizQueue.length){
+      if(hintMode) renderChoices(quizQueue[quizIdx]); else useTextInput();
+    }
+  });
+
+  function submitAnswer(raw){
+    if(quizIdx >= quizQueue.length) return;
+    const p = quizQueue[quizIdx];
+    const ans = (raw !== undefined ? raw : quizInput.value).trim().toUpperCase();
+    if(!ans) return;
+    const correct = ans === p.name;
+    if(correct){
+      if(!itemMissed) firstTryCorrect++;
+      quizFeedback.textContent = 'Верно!';
+      quizFeedback.className = 'feedback good';
+      markerFor(p.name).classList.remove('target');
+      markerFor(p.name).classList.add('solved');
+      quizInput.disabled = true;
+      quizIdx++;
+      setTimeout(nextQuizItem, 550);
+    } else {
+      itemMissed = true;
+      quizMistakes++;
+      if(!quizMissed.includes(p.name)) quizMissed.push(p.name);
+      quizFeedback.textContent = `Неверно. Это ${p.name}.`;
+      quizFeedback.className = 'feedback bad';
+      markerFor(p.name).classList.add('reveal');
+      quizInput.disabled = true;
+      quizChoices.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+      quizNextBtn.hidden = false;
+    }
+  }
+  quizNextBtn.addEventListener('click', ()=>{
+    quizIdx++;
+    quizChoices.querySelectorAll('.choice').forEach(b=>b.disabled=false);
+    nextQuizItem();
+  });
+  document.getElementById('quizSubmit').addEventListener('click', ()=>submitAnswer());
+  quizInput.addEventListener('keydown', e=>{ if(e.key==='Enter') submitAnswer(); });
+
+  function finishQuiz(){
+    const ms = Date.now()-quizStart;
+    const pct = Math.round(firstTryCorrect/quizQueue.length*100);
+    showResults({pct, ms, mistakes:quizMistakes, missed:quizMissed, mode:'quiz'});
+  }
+
+  /* ================= DRAG MODE ================= */
+  const trayEl = document.getElementById('tray');
+  let dragStart=0, dragMistakes=0, dragSolved=0, dragTotal=0, armedChip=null;
+  const ghost = document.createElement('div');
+  ghost.className = 'chip drag-ghost'; ghost.hidden = true;
+  document.body.appendChild(ghost);
+
+  function startDrag(subset){
+    const list = subset ? ACTIVE_POINTS.filter(p=>subset.includes(p.name)) : ACTIVE_POINTS;
+    dragTotal = list.length; dragSolved = 0; dragMistakes = 0;
+    dragStart = Date.now();
+    clearMarkerStates();
+    setScopeMode('drag');
+    panels.drag.hidden = false; panels.results.hidden = true;
+    trayEl.innerHTML = '';
+    shuffle(list).forEach(p=>{
+      const chip = document.createElement('div');
+      chip.className = 'chip'; chip.dataset.name = p.name; chip.textContent = p.name;
+      trayEl.appendChild(chip);
+    });
+    updateDragProgress();
+  }
+
+  function updateDragProgress(){
+    document.getElementById('dragProgressBar').style.width = (dragSolved/dragTotal*100)+'%';
+    document.getElementById('dragCount').textContent = `${dragSolved} / ${dragTotal}`;
+  }
+
+  let pdrag = null;
+  trayEl.addEventListener('pointerdown', e=>{
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    pdrag = {chip, name:chip.dataset.name, sx:e.clientX, sy:e.clientY, moved:false};
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!pdrag) return;
+    const dx=e.clientX-pdrag.sx, dy=e.clientY-pdrag.sy;
+    if(!pdrag.moved && Math.hypot(dx,dy) > 6){
+      pdrag.moved = true;
+      pdrag.chip.classList.add('dragging-src');
+      ghost.hidden = false;
+      ghost.textContent = pdrag.name;
+    }
+    if(pdrag.moved){ ghost.style.left = e.clientX+'px'; ghost.style.top = e.clientY+'px'; }
+  });
+  window.addEventListener('pointerup', e=>{
+    if(!pdrag) return;
+    ghost.hidden = true;
+    pdrag.chip.classList.remove('dragging-src');
+    if(pdrag.moved){
+      attemptPlace(pdrag.name, pdrag.chip, e.clientX, e.clientY);
+    } else if(panels.drag.hidden === false) {
+      if(armedChip === pdrag.chip){ armedChip.classList.remove('armed'); armedChip=null; }
+      else { if(armedChip) armedChip.classList.remove('armed'); armedChip = pdrag.chip; pdrag.chip.classList.add('armed'); }
+    }
+    pdrag = null;
+  });
+  function attemptPlace(name, chipEl, x, y, forcedWp){
+    let target = forcedWp;
+    if(!target){
+      target = allMarkers().find(wp=>{
+        if(wp.classList.contains('solved')) return false;
+        const r = wp.querySelector('.wp-hit').getBoundingClientRect();
+        const cx = r.left+r.width/2, cy = r.top+r.height/2;
+        return Math.hypot(x-cx, y-cy) <= r.width/2;
+      });
+    }
+    if(!target) return;
+    if(target.dataset.name === name){
+      target.classList.add('solved');
+      target.querySelector('.wp-label').textContent = name;
+      chipEl.remove();
+      dragSolved++;
+      updateDragProgress();
+      if(dragSolved === dragTotal) finishDrag();
+    } else {
+      target.classList.add('wrong-flash');
+      setTimeout(()=>target.classList.remove('wrong-flash'), 350);
+      dragMistakes++;
+    }
+  }
+
+  function finishDrag(){
+    const ms = Date.now()-dragStart;
+    const pct = Math.round(dragTotal/(dragTotal+dragMistakes)*100);
+    showResults({pct, ms, mistakes:dragMistakes, missed:[], mode:'drag'});
+  }
+})();
+</script>
