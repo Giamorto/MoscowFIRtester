@@ -10,7 +10,7 @@
     --structural:#1f7a7a; --accent:#c9832a;
     --pt-sid:#2f6fd6; --pt-star:#12946b;
     --pt-sid-bg:#bfe0f5; --pt-star-bg:#c2e9c8;
-    --boundary:#7c4fe0; --route-fill:#c7c2e6;
+    --boundary:#7c4fe0;
     --good:#2f9e52; --bad:#c1473f;
     --text:#10161f; --text-muted:#586170;
     --card-line:rgba(16,22,31,.09);
@@ -26,8 +26,7 @@
       --structural:#4fc4c4; --accent:#e2a33d;
       --pt-sid:#6aa8ff; --pt-star:#34d399;
       --pt-sid-bg:#264160; --pt-star-bg:#1e4530;
-      --boundary:#a882ff; --route-fill:#4d4570;
-      --good:#4caf6f; --bad:#e2695f;
+      --boundary:#a882ff;      --good:#4caf6f; --bad:#e2695f;
       --text:#e8ecf1; --text-muted:#98a3b3;
       --card-line:rgba(255,255,255,.09);
       --shadow:0 10px 28px rgba(0,0,0,.45);
@@ -40,8 +39,7 @@
     --structural:#4fc4c4; --accent:#e2a33d;
     --pt-sid:#6aa8ff; --pt-star:#34d399;
     --pt-sid-bg:#264160; --pt-star-bg:#1e4530;
-    --boundary:#a882ff; --route-fill:#4d4570;
-    --good:#4caf6f; --bad:#e2695f;
+    --boundary:#a882ff;    --good:#4caf6f; --bad:#e2695f;
     --text:#e8ecf1; --text-muted:#98a3b3;
     --card-line:rgba(255,255,255,.09);
     --shadow:0 10px 28px rgba(0,0,0,.45);
@@ -181,7 +179,6 @@
   .ring-label{font-family:var(--font-mono);font-size:9.5px;fill:var(--text-muted);}
   .spoke{stroke:var(--line-soft);stroke-width:1;}
   .spoke-label{font-family:var(--font-mono);font-size:11px;font-weight:600;fill:var(--text-muted);text-anchor:middle;}
-  .route-line{fill:none;stroke:var(--route-fill);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1.5px 1.5px rgba(16,22,31,.18));}
   .ring-hint{fill:none;stroke:var(--boundary);stroke-width:5;opacity:.85;stroke-linecap:round;stroke-dasharray:2 14;stroke-linejoin:round;}
   .ap{cursor:default;}
   .ap circle{fill:var(--paper-raised);stroke:var(--line);stroke-width:1.5;}
@@ -314,7 +311,7 @@
     </div>
     <div class="cards" id="cardList"></div>
     <div class="menu-foot">
-      Координаты точек — из AIP России, раздел UUWW AD 2.1: «Координаты точек пути RNAV» (цикл AIRAC AMDT 05/23) и карты SID/STAR Внуково, стр. 139–160 (циклы 11 JUL 24 / 05 SEP 24). Маршруты SID/STAR показаны по одному представительному варианту на точку выхода/входа — без деления по ВПП и категориям ВС, которое есть в оригинале. Пунктир на схеме МВЗ лишь соединяет точки по порядку азимута для наглядности — это не настоящая форма границы зоны, её изломы не всегда проходят через эти точки. Со временем точки и схемы могут меняться — сверяйте с актуальным AIP перед реальными полётами. Тренажёр не предназначен для навигации.
+      Координаты точек и роль SID/STAR каждой — из AIP России, раздел UUWW AD 2.1 «Координаты точек пути RNAV» (цикл AIRAC AMDT 05/23) и схемы маршрутов Внуково. Пунктир на схеме лишь соединяет точки по порядку азимута для наглядности — это не настоящая форма границы зоны, её изломы не всегда проходят через эти точки. Со временем точки могут меняться — сверяйте с актуальным AIP перед реальными полётами. Тренажёр не предназначен для навигации.
     </div>
   </div>
 </div>
@@ -363,85 +360,6 @@
     {name:'OLMUN', ...pt('560439.00N','0393303.00E'), type:'SID'},
   ];
 
-  // Промежуточные точки схем SID/STAR Внуково (не входят в кольцо МВЗ выше) — координаты и последовательность
-  // читаются напрямую с карт AIP UUWW AD 2.1: SID стр.139-154, STAR стр.155-160, цикл 11 JUL 24 / 05 SEP 24.
-  const EXTRA_POINTS = {
-    WW016: pt('552505.11N','0371058.85E'), WW017: pt('554039.30N','0371938.81E'),
-    WW018: pt('553915.77N','0372519.97E'), WW019: pt('553426.75N','0372929.75E'),
-    BITSA: pt('553400.00N','0373653.00E'), GEKLA: pt('553900.00N','0375205.00E'),
-    UNRUM: pt('553652.80N','0380842.50E'), ABVIV: pt('553431.00N','0382710.00E'),
-    KORFI: pt('553745.60N','0383656.70E'), MEFED: pt('554400.90N','0385557.00E'),
-    UDZOK: pt('555056.00N','0390900.00E'), BINPI: pt('555540.60N','0391804.30E'),
-    REMLI: pt('552150.00N','0373247.70E'), SOMAG: pt('551627.20N','0373939.90E'),
-    LIFAS: pt('551000.00N','0374753.00E'), SURZA: pt('550615.90N','0375440.00E'),
-    BABUT: pt('550242.90N','0380106.80E'), POZUK: pt('545102.90N','0382156.20E'),
-    OMEZA: pt('544546.70N','0383813.70E'), FEGRA: pt('543658.00N','0384723.90E'),
-    OFIRA: pt('545952.50N','0374336.10E'), RIREN: pt('545330.80N','0374615.20E'),
-    LAZIT: pt('543914.50N','0374934.00E'), SODLE: pt('551847.90N','0370654.70E'),
-    PIZUR: pt('551300.00N','0365953.00E'), TITAP: pt('550802.20N','0365614.50E'),
-    NIDOL: pt('545850.30N','0364932.30E'), LILGA: pt('544938.10N','0364253.10E'),
-    LIKNI: pt('553833.80N','0370134.30E'), GIGUN: pt('554407.00N','0365729.90E'),
-    NUZOR: pt('554903.80N','0365342.80E'), DUFAR: pt('555937.70N','0365408.60E'),
-    TIRDE: pt('560708.00N','0370254.20E'), TAFAZ: pt('561508.00N','0371731.00E'),
-    KOMNI: pt('562337.70N','0372407.70E'), GORNA: pt('563742.90N','0375006.10E'),
-    OSGAK: pt('564130.60N','0375649.20E'), DEFAL: pt('555443.60N','0364528.70E'),
-    RIZNO: pt('560519.30N','0363045.80E'), PUFIK: pt('555008.20N','0364441.10E'),
-    ITVIN: pt('554546.00N','0362901.00E'), NUKDI: pt('552059.80N','0355456.50E'),
-    PREKI: pt('551742.80N','0362249.70E'), LERTE: pt('551552.00N','0363714.00E'),
-    ORSIF: pt('551605.00N','0365816.00E'), RORUK: pt('551858.90N','0372213.90E'),
-    TAZOL: pt('564009.10N','0372319.30E'), SUBOD: pt('563208.90N','0371716.00E'),
-    FAMLA: pt('561746.90N','0370704.60E'), AGMER: pt('562609.40N','0371307.10E'),
-    ODNEL: pt('555609.20N','0365550.80E'), ASLEK: pt('553542.80N','0365950.90E'),
-    BUPOS: pt('552421.00N','0365950.90E'), SORUK: pt('561825.40N','0364618.00E'),
-    VIVZO: pt('554601.00N','0392403.00E'), LOGPU: pt('554255.00N','0384149.00E'),
-    DUZEV: pt('554150.00N','0382732.00E'), OTSUR: pt('554044.20N','0381319.50E'),
-    ENMUR: pt('553310.00N','0373419.00E'), KIBUR: pt('552744.46N','0373306.02E'),
-    RIFMA: pt('542928.70N','0384039.20E'), OKPEN: pt('544355.50N','0382807.20E'),
-    TEBDI: pt('550311.80N','0373144.10E'), TEPTA: pt('550141.70N','0372113.80E'),
-    FIDOT: pt('551300.00N','0372153.00E'), REKRO: pt('544532.00N','0372022.70E'),
-    OZLER: pt('545513.89N','0372051.60E'), TADUT: pt('551300.80N','0370148.30E'),
-    TOLKE: pt('550726.50N','0370439.90E'), RONEZ: pt('550319.60N','0371138.80E'),
-  };
-
-  const GATE_LOOKUP = Object.fromEntries(MVZ_POINTS.map(p=>[p.name,{lat:p.lat,lon:p.lon}]));
-  function lookupCoord(name){ return GATE_LOOKUP[name] || EXTRA_POINTS[name]; }
-
-  // Общий начальный участок SID показан по варианту RWY 01 (WW017-WW018-WW019); вариант RWY 06 (через WW063)
-  // ведёт к тем же воротам почти той же трассой и здесь для простоты не дублируется.
-  const SID_ROUTES = [
-    {gate:'KOGOM', path:['WW017','WW018','WW019','BITSA','GEKLA','UNRUM','ABVIV','KORFI','MEFED','UDZOK','BINPI','KOGOM']},
-    {gate:'OLMUN', path:['WW017','WW018','WW019','BITSA','GEKLA','UNRUM','ABVIV','KORFI','MEFED','UDZOK','BINPI','OLMUN']},
-    {gate:'TOGMO', path:['WW017','WW018','WW019','REMLI','SOMAG','LIFAS','SURZA','BABUT','POZUK','OMEZA','FEGRA','TOGMO']},
-    {gate:'EMGAS', path:['WW017','WW018','WW019','REMLI','SOMAG','OFIRA','RIREN','LAZIT','EMGAS']},
-    {gate:'SOTOG', path:['WW017','WW018','WW019','WW016','SODLE','PIZUR','TITAP','NIDOL','LILGA','SOTOG']},
-    {gate:'RILPO', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DUFAR','TIRDE','TAFAZ','KOMNI','GORNA','OSGAK','RILPO']},
-    {gate:'SUNUN', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DEFAL','RIZNO','SUNUN']},
-    {gate:'POKAG', path:['WW017','WW018','WW019','LIKNI','GIGUN','NUZOR','DEFAL','PUFIK','ITVIN','POKAG']},
-  ];
-
-  // Все STAR сходятся к RORUK (IAF). BEKIP присоединяется к общему стволу ROMTA в районе FAMLA.
-  const STAR_ROUTES = [
-    {gate:'BILRU', path:['BILRU','NUKDI','PREKI','LERTE','ORSIF','RORUK']},
-    {gate:'ROMTA', path:['ROMTA','TAZOL','SUBOD','FAMLA','AGMER','ODNEL','GIGUN','ASLEK','BUPOS','ORSIF','RORUK']},
-    {gate:'BEKIP', path:['BEKIP','SORUK','FAMLA','AGMER','ODNEL','GIGUN','ASLEK','BUPOS','ORSIF','RORUK']},
-    {gate:'DIMGI', path:['DIMGI','VIVZO','MEFED','LOGPU','DUZEV','OTSUR','GEKLA','ENMUR','KIBUR','RORUK']},
-    {gate:'OLOPI', path:['OLOPI','RIFMA','OKPEN','POZUK','TEBDI','TEPTA','FIDOT','RORUK']},
-    {gate:'LEKDO', path:['LEKDO','REKRO','OZLER','TADUT','TOLKE','RONEZ','TEPTA','FIDOT','RORUK']},
-  ];
-
-  function pointsFromRoutes(routes, type){
-    const seen = new Map();
-    routes.forEach(r=>r.path.forEach(name=>{
-      if(seen.has(name)) return;
-      const c = lookupCoord(name);
-      if(!c) return;
-      seen.set(name, {name, lat:c.lat, lon:c.lon, type});
-    }));
-    return [...seen.values()];
-  }
-  const SID_POINTS = pointsFromRoutes(SID_ROUTES, 'SID');
-  const STAR_POINTS = pointsFromRoutes(STAR_ROUTES, 'STAR');
-
   function ruPlural(n, one, few, many){
     const n100 = Math.abs(n)%100, n10 = n100%10;
     if(n100>10 && n100<20) return many;
@@ -455,12 +373,6 @@
     {id:'mvz-gates', title:'Точки входа и выхода МВЗ', desc:`${ptWord(MVZ_POINTS.length)} SID/STAR Внуково на границе зоны`, icon:'⛶', locked:false,
       points:MVZ_POINTS, routes:null, ringHint:true,
       note:'Коснитесь точки на схеме — появятся её координаты и азимут/дальность от Внуково. Синим — точки SID (выход из МВЗ), зелёным — STAR (вход в МВЗ). Пунктир просто соединяет точки по порядку азимута — это не настоящая форма границы МВЗ.'},
-    {id:'sid-uuww', title:'SID Внуково', desc:`${ptWord(SID_POINTS.length)} по 8 схемам вылета`, icon:'↗', locked:false,
-      points:SID_POINTS, routes:SID_ROUTES,
-      note:'Линии — реальные маршруты вылета по AIP (общий для всех участок от Внуково показан по варианту RWY 01). Коснитесь точки — увидите координаты и азимут/дальность от Внуково.'},
-    {id:'star-uuww', title:'STAR Внуково', desc:`${ptWord(STAR_POINTS.length)} по 6 схемам прилёта`, icon:'↘', locked:false,
-      points:STAR_POINTS, routes:STAR_ROUTES,
-      note:'Линии — реальные маршруты прилёта по AIP, все сходятся к точке RORUK (IAF). Коснитесь точки — увидите координаты и азимут/дальность от Внуково.'},
     {id:'ad-uuww', title:'Схема аэродрома Внуково', desc:'ВПП, РД, стоянки', icon:'▦', locked:true},
   ];
 
@@ -486,7 +398,7 @@
   }
 
   const CX=400, CY=400;
-  let ACTIVE_POINTS = MVZ_POINTS, ACTIVE_ROUTES = null;
+  let ACTIVE_POINTS = MVZ_POINTS;
   let maxDist, SCALE;
   function recomputeScale(){
     maxDist = Math.max(...ACTIVE_POINTS.map(p=>bearingDistNm(MOSCOW_CENTER.lat,MOSCOW_CENTER.lon,p.lat,p.lon).dist));
@@ -520,17 +432,7 @@
       bg += `<text class="spoke-label" x="${lx}" y="${ly+4}">${label}</text>`;
     });
 
-    if(ACTIVE_ROUTES){
-      ACTIVE_ROUTES.forEach(r=>{
-        const coords = r.path.map(lookupCoord).filter(Boolean);
-        if(coords.length<2) return;
-        const d = coords.map((c,i)=>{
-          const {x,y} = project(c.lat,c.lon);
-          return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
-        }).join(' ');
-        bg += `<path class="route-line" d="${d}"></path>`;
-      });
-    } else if(currentEx && currentEx.ringHint){
+    if(currentEx && currentEx.ringHint){
       const sorted = ACTIVE_POINTS.map(p=>({...p, ...project(p.lat,p.lon)})).sort((a,b)=>a.brg-b.brg);
       const d = sorted.map((p,i)=>(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ') + ' Z';
       bg += `<path class="ring-hint" d="${d}"></path>`;
@@ -759,7 +661,6 @@
   function openExercise(ex){
     currentEx = ex;
     ACTIVE_POINTS = ex.points;
-    ACTIVE_ROUTES = ex.routes || null;
     buildScope();
     document.getElementById('panelStudy').querySelector('.prompt').textContent = ex.note;
     menuEl.hidden = true;
